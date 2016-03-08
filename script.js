@@ -1,26 +1,91 @@
+/* IMPORTANT:
+for some reason the images aren't changing, they used to change depending on who was being quoted, I will look into this after finishing the other FCC front-end ziplines 
+
+maybe this might help https://4loc.wordpress.com/2009/04/28/documentready-vs-windowload/
+*/
+
+window.onload = nextButtonClick;
 
 //run this when 'NEXT' button is clicked
 function nextButtonClick() {
 	newQuote();
-	
-	//displayText.offsetHeight = 200px;
+	portraitUpdate()
 	return;
 }
 
-//run this when 'TWEET' button is clicked
-function tweetButtonClick(){
-	return;
+//encode string into twitter URL format, modified from: http://meyerweb.com/eric/tools/dencoder/
+function encode(unencoded) {
+	return unencoded.replace(/'/g,"%27").replace(/"/g,"%22");
 }
 
 //quote object
 var currentQuote;
+var canTweet; //Boolean flag,  can only tweet if id:'tweet-text' is 140 chars or less
 function newQuote() {
 	//return random quote object
 	currentQuote = quote[Math.floor(Math.random() * quote.length)];
 	document.getElementById('quote-text').innerHTML = currentQuote.line;
 	document.getElementById('quote-person').innerHTML = "- " + currentQuote.character;
 	document.getElementById('quote-episode').innerHTML = "EPISODE: " + currentQuote.episode;
+	
+	//set twitter text, check if 140 characters or less
+	var twitterString = currentQuote.line + " - " + currentQuote.character;
+	if(twitterString.length <= 140) {
+		canTweet = true;
+		twitterString = encode(twitterString);
+		document.getElementById('tweet-this').innerHTML = "TWEET";
+	} else{
+		canTweet = false
+		document.getElementById('tweet-this').innerHTML = "more than 140 characters, sorry";
+		twitterString = encode("I insist on tweeting over 140 characters") + "&hashtags=YOLO";
+	}
+	document.getElementById('tweet-this').setAttribute('href', 'https://twitter.com/intent/tweet?text=' + twitterString);
+	//console.log("Can tweet = " + canTweet + " (" +document.getElementById('tweet-text').innerHTML.length + " chars)" );return;
+}
+
+var currentPortrait = ""; //URL of image of character being quoted
+function portraitUpdate() {
+	if('url("'+currentPortrait+'")' === document.getElementById('quote-image').style.backgroundImage) {
+		return;
+	} else {
+		currentPortrait = portraitURL(currentQuote.character);
+		document.getElementById('quote-image').style.backgroundImage = 'url("'+currentPortrait+'")';
+	}
 	return;
+	
+}
+
+//there was surely a better way to do this, but as they are, the images are an extra, not a requirement
+//YOLO
+function portraitURL(name) {
+	switch(name) {
+		case 'James T. Kirk':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/kirk.jpg";
+		case 'Leonard McCoy':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/mccoy.jpg"	;
+		case 'Vina':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/vina.jpg";
+		case 'Spock':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/spock.jpg";
+		case 'Trelane':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/trelane.jpg";
+		case 'Scotty':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/scotty.jpg";
+		case 'Sarek':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/sarek.jpg";
+		case 'Richard Daystrom':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/daystrom.jpg";
+		case 'Surak':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/Surak.jpg";
+		case 'Colonel Green':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/green.jpg";
+		case 'Abraham Lincoln':
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/lincoln.jpg";
+
+		default:
+			console.log("Someone else was matched :(");
+			return "http://i213.photobucket.com/albums/cc69/ramboman88/placeholder-low-res.jpg";
+	}
 }
 
 function randQuote() {
@@ -95,77 +160,6 @@ var quote = [
 	{ episode: 'The Cloud Minders', character: 'Spock', line: 'Violence in reality is quite different from theory.' },
 	{ episode: 'The Savage Curtain', character: 'Surak', line: 'I am pleased to see that we have differences. May we together become greater than the sum of both of us.' },
 	{ episode: 'The Savage Curtain', character: 'Colonel Green', line: 'History tends to exaggerate.' },
-	{ episode: 'The Savage Curtain', character: 'Abraham Lincoln (hologram?)', line: 'There\'s no honorable way to kill, no gentle way to destroy. There is nothing good in war except its ending.' },
+	{ episode: 'The Savage Curtain', character: 'Abraham Lincoln', line: 'There\'s no honorable way to kill, no gentle way to destroy. There is nothing good in war except its ending.' },
 ];	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
