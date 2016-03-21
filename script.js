@@ -6,6 +6,11 @@ maybe this might help https://4loc.wordpress.com/2009/04/28/documentready-vs-win
 
 window.onload = nextButtonClick;
 
+var settings = {
+	usePhotobucketImages 		: false, // use for hosting app in codepen, or other places without image hosting
+	loadCharacterImagesAsNeeded	: true, // setting to fase will increase load time
+}
+
 //run this when 'NEXT' button is clicked
 function nextButtonClick() {
 	newQuote();
@@ -43,50 +48,59 @@ function newQuote() {
 	//console.log("Can tweet = " + canTweet + " (" +document.getElementById('tweet-text').innerHTML.length + " chars)" );return;
 }
 
-var currentPortrait = ""; //URL of image of character being quoted
-function portraitUpdate() {
-	if('url("'+currentPortrait+'")' === document.getElementById('quote-image').style.backgroundImage) {
-		return;
-	} else {
-		currentPortrait = portraitURL(currentQuote.character);
-		document.getElementById('quote-image').style.backgroundImage = 'url("'+currentPortrait+'")';
+
+// urls will be replaced with the actual image objects
+var portraits = (settings.usePhotobucketImages)? {
+	'James T. Kirk'		: "http://i213.photobucket.com/albums/cc69/ramboman88/kirk.jpg",
+	'Leonard McCoy'		: "http://i213.photobucket.com/albums/cc69/ramboman88/mccoy.jpg"	,
+	'Vina'				: "http://i213.photobucket.com/albums/cc69/ramboman88/vina.jpg",
+	'Spock'				: "http://i213.photobucket.com/albums/cc69/ramboman88/spock.jpg",
+	'Trelane'			: "http://i213.photobucket.com/albums/cc69/ramboman88/trelane.jpg",
+	'Scotty'			: "http://i213.photobucket.com/albums/cc69/ramboman88/scotty.jpg",
+	'Sarek'				: "http://i213.photobucket.com/albums/cc69/ramboman88/sarek.jpg",
+	'Richard Daystrom'	: "http://i213.photobucket.com/albums/cc69/ramboman88/daystrom.jpg",
+	'Surak'				: "http://i213.photobucket.com/albums/cc69/ramboman88/Surak.jpg",
+	'Colonel Green'		: "http://i213.photobucket.com/albums/cc69/ramboman88/green.jpg",
+	'Abraham Lincoln'	: "http://i213.photobucket.com/albums/cc69/ramboman88/lincoln.jpg",
+} : {
+	'James T. Kirk'		: "images/kirk.jpg",
+	'Leonard McCoy'		: "images/mccoy.jpg"	,
+	'Vina'				: "images/vina.jpg",
+	'Spock'				: "images/spock.jpg",
+	'Trelane'			: "images/trelane.jpg",
+	'Scotty'			: "images/scotty.jpg",
+	'Sarek'				: "images/sarek.jpg",
+	'Richard Daystrom'	: "images/daystrom.jpg",
+	'Surak'				: "images/Surak.jpg",
+	'Colonel Green'		: "images/green.jpg",
+	'Abraham Lincoln'	: "images/lincoln.jpg",
+}
+
+if (settings.loadCharacterImagesAsNeeded == false) {
+	for (var key in portraits) {
+		var characterImage = new Image();
+		characterImage.src = portraits[key];
+		portraits[key] = characterImage;
 	}
+}
+
+function portraitUpdate() {
+	var character = currentQuote.character;
+	
+	if (typeof(portraits[character]) !== "object") {
+		// load images as needed
+		var characterImage = new Image();
+		characterImage.src = portraits[character];
+		portraits[character] = characterImage;
+		
+	}
+	var oldImage = document.getElementById('quote-image').children[0];
+	var newImage = portraits[character]
+	document.getElementById('quote-image').replaceChild(newImage, oldImage)
 	return;
 	
 }
 
-//there was surely a better way to do this, but as they are, the images are an extra, not a requirement
-//YOLO
-function portraitURL(name) {
-	switch(name) {
-		case 'James T. Kirk':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/kirk.jpg";
-		case 'Leonard McCoy':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/mccoy.jpg"	;
-		case 'Vina':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/vina.jpg";
-		case 'Spock':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/spock.jpg";
-		case 'Trelane':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/trelane.jpg";
-		case 'Scotty':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/scotty.jpg";
-		case 'Sarek':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/sarek.jpg";
-		case 'Richard Daystrom':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/daystrom.jpg";
-		case 'Surak':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/Surak.jpg";
-		case 'Colonel Green':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/green.jpg";
-		case 'Abraham Lincoln':
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/lincoln.jpg";
-
-		default:
-			console.log("Someone else was matched :(");
-			return "http://i213.photobucket.com/albums/cc69/ramboman88/placeholder-low-res.jpg";
-	}
-}
 
 function randQuote() {
 	return quote[Math.floor(Math.random() * quote.length)];
